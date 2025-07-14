@@ -1,338 +1,359 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Programming Olympiad 2025 Project Plan</title>
   <style>
-body {
-  display: flex;
-  font-family: Arial, sans-serif;
-  margin: 0;
-  color: #333;
-}
-#sidebar {
-  width: 250px;
-  background-color: #2E3B4E;
-  color: white;
-  padding: 15px;
-  height: 100vh;
-  overflow-y: auto;
-}
-#sidebar h3 {
-  color: #f2b632;
-}
-#main {
-  flex: 1;
-  padding: 20px;
-  background-color: #f9f9f9;
-}
-h1 {
-  color: #2E3B4E;
-}
-h2 {
-  background-color: #f2b632;
-  color: #2E3B4E;
-  padding: 10px;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: white;
-  margin-bottom: 10px;
-}
-th, td {
-  border: 1px solid #ccc;
-  padding: 8px;
-}
-th {
-  background-color: #f2b632;
-  color: #2E3B4E;
-}
-input[type="text"], input[type="date"] {
-  width: 95%;
-  padding: 5px;
-}
-.completed-row {
-  background-color: #e6ffe6 !important;
-}
-.add-btn, .save-btn, .export-btn {
-  margin: 5px 5px 15px 0;
-  padding: 8px 12px;
-  background-color: #2E3B4E;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-.progress-container {
-  background-color: #ddd;
-  border-radius: 10px;
-  overflow: hidden;
-  height: 25px;
-  margin-bottom: 10px;
-}
-.progress-bar {
-  height: 100%;
-  background-color: #f2b632;
-  text-align: center;
-  color: #2E3B4E;
-  line-height: 25px;
-}
-</style>
+    body {
+      display: flex;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      color: #333;
+    }
+    #sidebar {
+      width: 250px;
+      background-color: #2E3B4E;
+      color: white;
+      padding: 15px;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    #sidebar h3 {
+      color: #f2b632;
+    }
+    #main {
+      flex: 1;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+    h1 {
+      color: #2E3B4E;
+    }
+    h2 {
+      background-color: #f2b632;
+      color: #2E3B4E;
+      padding: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      margin-bottom: 10px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+    th {
+      background-color: #f2b632;
+      color: #2E3B4E;
+    }
+    input[type="text"], input[type="date"] {
+      width: 95%;
+      padding: 5px;
+    }
+    .completed-row {
+      background-color: #e6ffe6 !important;
+    }
+    .add-btn, .save-btn, .export-btn {
+      margin: 5px 5px 15px 0;
+      padding: 8px 12px;
+      background-color: #2E3B4E;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .progress-container {
+      background-color: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      height: 25px;
+      margin-bottom: 10px;
+    }
+    .progress-bar {
+      height: 100%;
+      background-color: #f2b632;
+      text-align: center;
+      color: #2E3B4E;
+      line-height: 25px;
+    }
+    #unauthorized {
+      display: none;
+      text-align: center;
+      color: red;
+      font-weight: bold;
+      padding: 20px;
+    }
+  </style>
 </head>
 <body>
-
-<div id="sidebar">
-  <h3>Version History</h3>
-  <ul id="versionList"></ul>
-  <hr />
-  <h3>Current User</h3>
-  <p id="userIp">Loading IP...</p>
-  <p id="lastSaved">Last saved: Never</p>
-
-<h3>Select User</h3>
-<select id="userSelector" onchange="changeUser()">
-  <option value="Chanelle Booysen">Chanelle Booysen</option>
-  <option value="Admin">Admin</option>
-  <option value="Guest">Guest</option>
-</select>
-
-</div>
-
-<div id="main">
-<img src="IITPSA Logo.jpg" alt="IITPSA Logo" style="max-width: 200px; margin-bottom: 20px;">
-
-  <h1>Programming Olympiad 2025 Project Plan</h1>
-
-  <div id="overall-progress-container" class="progress-container">
-    <div id="overall-progress-bar" class="progress-bar">0%</div>
+  <div id="unauthorized">
+    Access Denied: Your IP address is not authorized to view this project plan.
   </div>
 
-  <div id="rounds"></div>
+  <div id="dashboard" style="display:none;">
+    <div id="sidebar">
+      <h3>Version History</h3>
+      <ul id="versionList"></ul>
+      <hr />
+      <h3>Current User</h3>
+      <p id="userIp">Loading IP...</p>
+      <h3>Select User</h3>
+      <select id="userSelector" onchange="changeUser()">
+        <option value="Chanelle Booysen">Chanelle Booysen</option>
+        <option value="Admin">Admin</option>
+        <option value="Guest">Guest</option>
+      </select>
+      <p id="lastSaved">Last saved: Never</p>
+    </div>
 
-  <button class="save-btn" onclick="saveAll()">💾 Save Progress</button>
-  <button class="export-btn" onclick="exportToCSV()">📤 Download CSV</button>
-<button class="export-btn" onclick="emailReport()">📧 Email Report</button>
-</div>
+    <div id="main">
+      <img src="IITPSA Logo.jpg" alt="IITPSA Logo" style="max-width: 200px; margin-bottom: 20px;" />
+      <h1>Programming Olympiad 2025 Project Plan</h1>
+      <div id="overall-progress-container" class="progress-container">
+        <div id="overall-progress-bar" class="progress-bar">0%</div>
+      </div>
+      <div id="rounds"></div>
+      <button class="save-btn" onclick="saveAll()">💾 Save Progress</button>
+      <button class="export-btn" onclick="exportToCSV()">📤 Download CSV</button>
+      <button class="export-btn" onclick="emailReport()">📧 Email Report</button>
+    </div>
+  </div>
 
-<script>
-
-  const allowedIPs = [
-      "41.146.192.188: Chanelle Booysen",
-      "41.150.227.167: Evelyn Moloantoa",   // Evelyn Moloantoa
+  <script>
+    const allowedIPs = [
+      "41.146.192.188",
+      "41.150.227.167",
       "102.132.10.50",
       "154.72.15.33"
     ];
 
-  const rounds = [
-    { id: 'round1', title: "Round 1: Online Contest", initialTasks: ["Publish Contest Date", "Upload Questions", "Open Registration"] },
-    { id: 'round2', title: "Round 2: Online Contest", initialTasks: ["Mark Scripts", "Publish Results", "Notify Finalists"] },
-    { id: 'round3', title: "Round 3: Finals & Awards Ceremony", initialTasks: ["Book Venue", "Plan Catering", "Manage Program", "Send Invitations"] }
-  ];
+    const ipUserMap = {
+      "41.146.192.188": "Chanelle Booysen",
+      "41.150.227.167": "Evelyn Moloantoa",
+      "102.132.10.50": "User 3",
+      "154.72.15.33": "User 4"
+    };
 
-  function createTable(round) {
-    const container = document.createElement("div");
-    container.innerHTML = `
-      <h2>${round.title}</h2>
-      <div class="progress-container"><div id="${round.id}-progress" class="progress-bar">0%</div></div>
-      <table id="${round.id}"><thead><tr>
-        <th>Done</th><th>Task</th><th>Comment</th><th>Date Completed</th>
-      </tr></thead><tbody></tbody></table>
-      <button class="add-btn" onclick="addRow('${round.id}')">+ Add Task</button>`;
-    document.getElementById("rounds").appendChild(container);
-  }
+    const rounds = [
+      { id: "round1", title: "Round 1: Online Contest", initialTasks: ["Publish Contest Date", "Upload Questions", "Open Registration"] },
+      { id: "round2", title: "Round 2: Online Contest", initialTasks: ["Mark Scripts", "Publish Results", "Notify Finalists"] },
+      { id: "round3", title: "Round 3: Finals & Awards Ceremony", initialTasks: ["Book Venue", "Plan Catering", "Manage Program", "Send Invitations"] }
+    ];
 
-  function addRow(tableId, task = "", comment = "", date = "", done = false) {
-    const table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
-    const row = table.insertRow();
-    row.innerHTML = `<td><input type="checkbox"${done ? " checked" : ""}></td>
-                     <td><input type="text" value="${task}"></td>
-                     <td><input type="text" value="${comment}"></td>
-                     <td><input type="date" value="${date}"></td>`;
-    row.querySelector("input[type='checkbox']").addEventListener("change", () => {
-      updateProgress(); updateHighlight(row);
-    });
-    updateHighlight(row);
-    updateProgress();
-  }
-
-  function updateHighlight(row) {
-    row.classList.toggle("completed-row", row.querySelector("input[type='checkbox']").checked);
-  }
-
-  function updateProgress() {
-    let total = 0, done = 0;
-    rounds.forEach(round => {
-      const tbody = document.getElementById(round.id).querySelector("tbody");
-      let roundTotal = 0, roundDone = 0;
-      Array.from(tbody.rows).forEach(row => {
-        total++; roundTotal++;
-        if (row.querySelector("input[type='checkbox']").checked) {
-          done++; roundDone++;
+    // IP access control
+    async function enforceIPAccess() {
+      try {
+        const res = await fetch("https://ipinfo.io/json?token=4fb0252538d9d1");
+        const data = await res.json();
+        const userIP = data.ip;
+        if (allowedIPs.includes(userIP)) {
+          document.getElementById("dashboard").style.display = "flex";
+          document.getElementById("unauthorized").style.display = "none";
+        } else {
+          document.getElementById("dashboard").style.display = "none";
+          document.getElementById("unauthorized").style.display = "block";
+          return; // stop loading data if unauthorized
         }
+        const user = ipUserMap[userIP] || "Unknown User";
+        document.getElementById("userIp").textContent = `${userIP} (${user})`;
+        await loadLatestSavedVersion();  // load saved data only after IP check passed
+      } catch (e) {
+        document.getElementById("unauthorized").textContent = "Unable to verify IP address.";
+        document.getElementById("unauthorized").style.display = "block";
+        document.getElementById("dashboard").style.display = "none";
+      }
+    }
+
+    // Create tables for rounds
+    function createTable(round) {
+      const container = document.createElement("div");
+      container.innerHTML = `
+        <h2>${round.title}</h2>
+        <div class="progress-container"><div id="${round.id}-progress" class="progress-bar">0%</div></div>
+        <table id="${round.id}"><thead><tr>
+          <th>Done</th><th>Task</th><th>Comment</th><th>Date Completed</th>
+        </tr></thead><tbody></tbody></table>
+        <button class="add-btn" onclick="addRow('${round.id}')">+ Add Task</button>`;
+      document.getElementById("rounds").appendChild(container);
+    }
+
+    function addRow(tableId, task = "", comment = "", date = "", done = false) {
+      const table = document.getElementById(tableId).getElementsByTagName("tbody")[0];
+      const row = table.insertRow();
+      row.innerHTML = `<td><input type="checkbox"${done ? " checked" : ""}></td>
+                       <td><input type="text" value="${task}"></td>
+                       <td><input type="text" value="${comment}"></td>
+                       <td><input type="date" value="${date}"></td>`;
+      row.querySelector("input[type='checkbox']").addEventListener("change", () => {
+        updateProgress();
+        updateHighlight(row);
       });
-      const percent = roundTotal ? Math.round(roundDone / roundTotal * 100) : 0;
-      const bar = document.getElementById(`${round.id}-progress`);
-      bar.style.width = percent + "%"; bar.textContent = percent + "%";
-    });
-    const overall = total ? Math.round(done / total * 100) : 0;
-    const overallBar = document.getElementById("overall-progress-bar");
-    overallBar.style.width = overall + "%";
-    overallBar.textContent = overall + "%";
-  }
+      updateHighlight(row);
+      updateProgress();
+    }
 
-  function saveAll() {
-    const data = {};
-    rounds.forEach(round => {
-      const tbody = document.getElementById(round.id).querySelector("tbody");
-      data[round.id] = Array.from(tbody.rows).map(row => {
-        const cells = row.querySelectorAll("input");
-        return {
-          done: cells[0].checked,
-          task: cells[1].value,
-          comment: cells[2].value,
-          date: cells[3].value,
-          timestamp: new Date().toISOString()
-        };
-      });
-    });
+    function updateHighlight(row) {
+      row.classList.toggle("completed-row", row.querySelector("input[type='checkbox']").checked);
+    }
 
-function updateLastSavedTime() {
-  const savedData = JSON.parse(localStorage.getItem("projectHistory") || "[]");
-  if (!savedData.length) return;
-  const lastEntry = savedData[savedData.length - 1];
-  const time = new Date(lastEntry.timestamp).toLocaleString();
-  document.getElementById("lastSaved").textContent = `Last saved: ${time}`;
-}
-
-
-    const history = JSON.parse(localStorage.getItem("projectHistory") || "[]");
-    history.push({ timestamp: new Date().toISOString(), data });
-    fetch("/.netlify/functions/saveData", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(data),
-})
-.then(res => res.json())
-.then(res => {
-  alert("Saved to server!");
-  console.log(res);
-});
-
-function loadFromServer() {
-  fetch("/.netlify/functions/loadData")
-    .then(res => res.json())
-    .then(data => {
-      if (!data || Object.keys(data).length === 0) return;
-      rounds.forEach(round => {
+    function updateProgress() {
+      let total = 0,
+        done = 0;
+      rounds.forEach((round) => {
         const tbody = document.getElementById(round.id).querySelector("tbody");
-        tbody.innerHTML = "";
-        data[round.id]?.forEach(task => {
-          addRow(round.id, task.task, task.comment, task.date, task.done);
+        let roundTotal = 0,
+          roundDone = 0;
+        Array.from(tbody.rows).forEach((row) => {
+          total++;
+          roundTotal++;
+          if (row.querySelector("input[type='checkbox']").checked) {
+            done++;
+            roundDone++;
+          }
+        });
+        const percent = roundTotal ? Math.round((roundDone / roundTotal) * 100) : 0;
+        const bar = document.getElementById(`${round.id}-progress`);
+        bar.style.width = percent + "%";
+        bar.textContent = percent + "%";
+      });
+      const overall = total ? Math.round((done / total) * 100) : 0;
+      const overallBar = document.getElementById("overall-progress-bar");
+      overallBar.style.width = overall + "%";
+      overallBar.textContent = overall + "%";
+    }
+
+    // --- NEW: Save/load project data via Netlify Functions ---
+
+    // Save project progress to backend
+    async function saveAll() {
+      const data = {};
+      rounds.forEach((round) => {
+        const tbody = document.getElementById(round.id).querySelector("tbody");
+        data[round.id] = Array.from(tbody.rows).map((row) => {
+          const cells = row.querySelectorAll("input");
+          return {
+            done: cells[0].checked,
+            task: cells[1].value,
+            comment: cells[2].value,
+            date: cells[3].value,
+            timestamp: new Date().toISOString(),
+          };
         });
       });
-      updateProgress();
-    });
-}
-    localStorage.setItem("projectData", JSON.stringify(data));
-    localStorage.setItem("projectHistory", JSON.stringify(history));
-    populateVersionList();
-    alert("Saved!");
-  }
 
-  function exportToCSV() {
-    let csv = "Round,Done,Task,Comment,Date Completed";
-    rounds.forEach(round => {
-      const tbody = document.getElementById(round.id).querySelector("tbody");
-      Array.from(tbody.rows).forEach(row => {
-        const inputs = row.querySelectorAll("input");
-        csv += `"${round.title}","${inputs[0].checked ? "Yes" : "No"}","${inputs[1].value}","${inputs[2].value}","${inputs[3].value}"
-`;
-      });
-    });
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "Project_Plan_Progress.csv";
-    link.click();
-  }
-
-  function populateVersionList() {
-    const list = document.getElementById("versionList");
-    list.innerHTML = "";
-    const history = JSON.parse(localStorage.getItem("projectHistory") || "[]");
-    history.reverse().forEach((entry, i) => {
-      const li = document.createElement("li");
-      const date = new Date(entry.timestamp);
-      li.innerHTML = `<a href="#" onclick="loadVersion(${history.length - 1 - i})">${date.toLocaleString()}</a>`;
-      list.appendChild(li);
-    });
-  }
-
-  function loadVersion(index) {
-    const history = JSON.parse(localStorage.getItem("projectHistory") || "[]");
-    if (!history[index]) return;
-    const data = history[index].data;
-    rounds.forEach(round => {
-      const tbody = document.getElementById(round.id).querySelector("tbody");
-      tbody.innerHTML = "";
-      data[round.id].forEach(task => {
-        addRow(round.id, task.task, task.comment, task.date, task.done);
-      });
-    });
-  }
-
-  async function fetchUserIP() {
-    try {
-      const res = await fetch("https://ipinfo.io/json?token=4fb0252538d9d1");
-      const data = await res.json();
-      
-      const user = ipUserMap[data.ip] || "Unknown User";
-      document.getElementById("userIp").textContent = `${data.ip} (${user})`;
-
-    } catch (e) {
-      document.getElementById("userIp").textContent = "IP unavailable";
+      try {
+        const res = await fetch("/.netlify/functions/save-data", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const json = await res.json();
+        if (json.success) {
+          alert("Saved to server!");
+          updateLastSavedTime();
+          populateVersionList(); // update version list if needed
+        } else {
+          alert("Save failed");
+        }
+      } catch (e) {
+        alert("Error saving data: " + e.message);
+      }
     }
-  }
 
-  rounds.forEach(createTable);
-  rounds.forEach(round => round.initialTasks.forEach(task => addRow(round.id, task)));
-  populateVersionList();
-  fetchUserIP();
+    // Load project progress from backend
+    async function loadLatestSavedVersion() {
+      try {
+        const res = await fetch("/.netlify/functions/get-data");
+        if (!res.ok) throw new Error("Failed to load saved data");
+        const data = await res.json();
 
-function changeUser() {
-  const user = document.getElementById("userSelector").value;
-  document.getElementById("userIp").textContent = `${user} (Manual Select)`;
-}
+        rounds.forEach((round) => {
+          const tbody = document.getElementById(round.id).querySelector("tbody");
+          tbody.innerHTML = "";
+          if (data[round.id]) {
+            data[round.id].forEach((task) => {
+              addRow(round.id, task.task, task.comment, task.date, task.done);
+            });
+          } else {
+            // If no saved data, add initial tasks
+            round.initialTasks.forEach((task) => addRow(round.id, task));
+          }
+        });
+        updateProgress();
+        updateLastSavedTime();
+        populateVersionList();
+      } catch (e) {
+        // fallback: load initial tasks if error
+        rounds.forEach((round) => {
+          const tbody = document.getElementById(round.id).querySelector("tbody");
+          tbody.innerHTML = "";
+          round.initialTasks.forEach((task) => addRow(round.id, task));
+        });
+        updateProgress();
+        alert("Could not load saved data, loaded defaults.");
+      }
+    }
 
-function emailReport() {
-  const email = prompt("Enter email address to send report:");
-  if (!email) return;
-  const subject = "Project Plan Report";
-  const body = "Please find the attached report.\n(You can attach the downloaded CSV)";
-  window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-}
+    // Populate version history list - can be adapted to fetch versions from backend if available
+    function populateVersionList() {
+      // This can be extended to fetch real version history from backend later
+      const list = document.getElementById("versionList");
+      list.innerHTML = "<li>Version history feature coming soon...</li>";
+    }
 
-// 👇 Load previously saved progress on page load
-function loadLatestSavedVersion() {
-  const savedData = localStorage.getItem("projectData");
-  if (!savedData) return;
+    // Show last saved time - you can extend this to fetch from backend
+    function updateLastSavedTime() {
+      const now = new Date();
+      document.getElementById("lastSaved").textContent = `Last saved: ${now.toLocaleString()}`;
+    }
 
-  const data = JSON.parse(savedData);
-  rounds.forEach(round => {
-    const tbody = document.getElementById(round.id).querySelector("tbody");
-    tbody.innerHTML = ""; // Clear current content
-    data[round.id].forEach(task => {
-      addRow(round.id, task.task, task.comment, task.date, task.done);
-    });
-  });
-  updateProgress();
-}
+    // Existing functions for user IP fetch, change user, export, email report
+    async function fetchUserIP() {
+      try {
+        const res = await fetch("https://ipinfo.io/json?token=4fb0252538d9d1");
+        const data = await res.json();
+        const user = ipUserMap[data.ip] || "Unknown User";
+        document.getElementById("userIp").textContent = `${data.ip} (${user})`;
+      } catch (e) {
+        document.getElementById("userIp").textContent = "IP unavailable";
+      }
+    }
 
-// ✅ Call on page load
-loadLatestSavedVersion();
+    function changeUser() {
+      const user = document.getElementById("userSelector").value;
+      document.getElementById("userIp").textContent = `${user} (Manual Select)`;
+    }
 
+    function exportToCSV() {
+      let csv = "Round,Done,Task,Comment,Date Completed\n";
+      rounds.forEach((round) => {
+        const tbody = document.getElementById(round.id).querySelector("tbody");
+        Array.from(tbody.rows).forEach((row) => {
+          const inputs = row.querySelectorAll("input");
+          csv += `"${round.title}","${inputs[0].checked ? "Yes" : "No"}","${inputs[1].value}","${inputs[2].value}","${inputs[3].value}"\n`;
+        });
+      });
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "Project_Plan_Progress.csv";
+      link.click();
+    }
 
-</script>
+    function emailReport() {
+      const email = prompt("Enter email address to send report:");
+      if (!email) return;
+      const subject = "Project Plan Report";
+      const body = "Please find the attached report.\n(You can attach the downloaded CSV)";
+      window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    }
+
+    // Initialize tables
+    rounds.forEach(createTable);
+
+    // Start app after IP check
+    enforceIPAccess();
+  </script>
 </body>
 </html>
