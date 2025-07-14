@@ -193,6 +193,16 @@ input[type="text"], input[type="date"] {
         };
       });
     });
+
+function updateLastSavedTime() {
+  const savedData = JSON.parse(localStorage.getItem("projectHistory") || "[]");
+  if (!savedData.length) return;
+  const lastEntry = savedData[savedData.length - 1];
+  const time = new Date(lastEntry.timestamp).toLocaleString();
+  document.getElementById("lastSaved").textContent = `Last saved: ${time}`;
+}
+
+    
     const history = JSON.parse(localStorage.getItem("projectHistory") || "[]");
     history.push({ timestamp: new Date().toISOString(), data });
     localStorage.setItem("projectData", JSON.stringify(data));
