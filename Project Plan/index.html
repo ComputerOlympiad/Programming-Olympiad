@@ -1,0 +1,278 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Programming Olympiad 2025 Project Plan</title>
+  <style>
+body {
+  display: flex;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  color: #333;
+}
+#sidebar {
+  width: 250px;
+  background-color: #2E3B4E;
+  color: white;
+  padding: 15px;
+  height: 100vh;
+  overflow-y: auto;
+}
+#sidebar h3 {
+  color: #f2b632;
+}
+#main {
+  flex: 1;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+h1 {
+  color: #2E3B4E;
+}
+h2 {
+  background-color: #f2b632;
+  color: #2E3B4E;
+  padding: 10px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  margin-bottom: 10px;
+}
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+th {
+  background-color: #f2b632;
+  color: #2E3B4E;
+}
+input[type="text"], input[type="date"] {
+  width: 95%;
+  padding: 5px;
+}
+.completed-row {
+  background-color: #e6ffe6 !important;
+}
+.add-btn, .save-btn, .export-btn {
+  margin: 5px 5px 15px 0;
+  padding: 8px 12px;
+  background-color: #2E3B4E;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+.progress-container {
+  background-color: #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  height: 25px;
+  margin-bottom: 10px;
+}
+.progress-bar {
+  height: 100%;
+  background-color: #f2b632;
+  text-align: center;
+  color: #2E3B4E;
+  line-height: 25px;
+}
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <h3>Version History</h3>
+  <ul id="versionList"></ul>
+  <hr />
+  <h3>Current User</h3>
+  <p id="userIp">Loading IP...</p>
+
+<h3>Select User</h3>
+<select id="userSelector" onchange="changeUser()">
+  <option value="Chanelle Booysen">Chanelle Booysen</option>
+  <option value="Admin">Admin</option>
+  <option value="Guest">Guest</option>
+</select>
+
+</div>
+
+<div id="main">
+<img src="IITPSA Logo.jpg" alt="IITPSA Logo" style="max-width: 200px; margin-bottom: 20px;">
+
+  <h1>Programming Olympiad 2025 Project Plan</h1>
+
+  <div id="overall-progress-container" class="progress-container">
+    <div id="overall-progress-bar" class="progress-bar">0%</div>
+  </div>
+
+  <div id="rounds"></div>
+
+  <button class="save-btn" onclick="saveAll()">💾 Save Progress</button>
+  <button class="export-btn" onclick="exportToCSV()">📤 Download CSV</button>
+<button class="export-btn" onclick="emailReport()">📧 Email Report</button>
+</div>
+
+<script>
+
+  const ipUserMap = {
+    "41.146.192.188": "Chanelle Booysen"
+  };
+
+  const rounds = [
+    { id: 'round1', title: "Round 1: Online Contest", initialTasks: ["Publish Contest Date", "Upload Questions", "Open Registration"] },
+    { id: 'round2', title: "Round 2: Online Contest", initialTasks: ["Mark Scripts", "Publish Results", "Notify Finalists"] },
+    { id: 'round3', title: "Round 3: Finals & Awards Ceremony", initialTasks: ["Book Venue", "Plan Catering", "Manage Program", "Send Invitations"] }
+  ];
+
+  function createTable(round) {
+    const container = document.createElement("div");
+    container.innerHTML = `
+      <h2>${round.title}</h2>
+      <div class="progress-container"><div id="${round.id}-progress" class="progress-bar">0%</div></div>
+      <table id="${round.id}"><thead><tr>
+        <th>Done</th><th>Task</th><th>Comment</th><th>Date Completed</th>
+      </tr></thead><tbody></tbody></table>
+      <button class="add-btn" onclick="addRow('${round.id}')">+ Add Task</button>`;
+    document.getElementById("rounds").appendChild(container);
+  }
+
+  function addRow(tableId, task = "", comment = "", date = "", done = false) {
+    const table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
+    const row = table.insertRow();
+    row.innerHTML = `<td><input type="checkbox"${done ? " checked" : ""}></td>
+                     <td><input type="text" value="${task}"></td>
+                     <td><input type="text" value="${comment}"></td>
+                     <td><input type="date" value="${date}"></td>`;
+    row.querySelector("input[type='checkbox']").addEventListener("change", () => {
+      updateProgress(); updateHighlight(row);
+    });
+    updateHighlight(row);
+    updateProgress();
+  }
+
+  function updateHighlight(row) {
+    row.classList.toggle("completed-row", row.querySelector("input[type='checkbox']").checked);
+  }
+
+  function updateProgress() {
+    let total = 0, done = 0;
+    rounds.forEach(round => {
+      const tbody = document.getElementById(round.id).querySelector("tbody");
+      let roundTotal = 0, roundDone = 0;
+      Array.from(tbody.rows).forEach(row => {
+        total++; roundTotal++;
+        if (row.querySelector("input[type='checkbox']").checked) {
+          done++; roundDone++;
+        }
+      });
+      const percent = roundTotal ? Math.round(roundDone / roundTotal * 100) : 0;
+      const bar = document.getElementById(`${round.id}-progress`);
+      bar.style.width = percent + "%"; bar.textContent = percent + "%";
+    });
+    const overall = total ? Math.round(done / total * 100) : 0;
+    const overallBar = document.getElementById("overall-progress-bar");
+    overallBar.style.width = overall + "%";
+    overallBar.textContent = overall + "%";
+  }
+
+  function saveAll() {
+    const data = {};
+    rounds.forEach(round => {
+      const tbody = document.getElementById(round.id).querySelector("tbody");
+      data[round.id] = Array.from(tbody.rows).map(row => {
+        const cells = row.querySelectorAll("input");
+        return {
+          done: cells[0].checked,
+          task: cells[1].value,
+          comment: cells[2].value,
+          date: cells[3].value,
+          timestamp: new Date().toISOString()
+        };
+      });
+    });
+    const history = JSON.parse(localStorage.getItem("projectHistory") || "[]");
+    history.push({ timestamp: new Date().toISOString(), data });
+    localStorage.setItem("projectData", JSON.stringify(data));
+    localStorage.setItem("projectHistory", JSON.stringify(history));
+    populateVersionList();
+    alert("Saved!");
+  }
+
+  function exportToCSV() {
+    let csv = "Round,Done,Task,Comment,Date Completed";
+    rounds.forEach(round => {
+      const tbody = document.getElementById(round.id).querySelector("tbody");
+      Array.from(tbody.rows).forEach(row => {
+        const inputs = row.querySelectorAll("input");
+        csv += `"${round.title}","${inputs[0].checked ? "Yes" : "No"}","${inputs[1].value}","${inputs[2].value}","${inputs[3].value}"
+`;
+      });
+    });
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "Project_Plan_Progress.csv";
+    link.click();
+  }
+
+  function populateVersionList() {
+    const list = document.getElementById("versionList");
+    list.innerHTML = "";
+    const history = JSON.parse(localStorage.getItem("projectHistory") || "[]");
+    history.reverse().forEach((entry, i) => {
+      const li = document.createElement("li");
+      const date = new Date(entry.timestamp);
+      li.innerHTML = `<a href="#" onclick="loadVersion(${history.length - 1 - i})">${date.toLocaleString()}</a>`;
+      list.appendChild(li);
+    });
+  }
+
+  function loadVersion(index) {
+    const history = JSON.parse(localStorage.getItem("projectHistory") || "[]");
+    if (!history[index]) return;
+    const data = history[index].data;
+    rounds.forEach(round => {
+      const tbody = document.getElementById(round.id).querySelector("tbody");
+      tbody.innerHTML = "";
+      data[round.id].forEach(task => {
+        addRow(round.id, task.task, task.comment, task.date, task.done);
+      });
+    });
+  }
+
+  async function fetchUserIP() {
+    try {
+      const res = await fetch("https://api.ipify.org?format=json");
+      const data = await res.json();
+      
+      const user = ipUserMap[data.ip] || "Unknown User";
+      document.getElementById("userIp").textContent = `${data.ip} (${user})`;
+
+    } catch (e) {
+      document.getElementById("userIp").textContent = "IP unavailable";
+    }
+  }
+
+  rounds.forEach(createTable);
+  rounds.forEach(round => round.initialTasks.forEach(task => addRow(round.id, task)));
+  populateVersionList();
+  fetchUserIP();
+
+function changeUser() {
+  const user = document.getElementById("userSelector").value;
+  document.getElementById("userIp").textContent = `${user} (Manual Select)`;
+}
+
+function emailReport() {
+  const email = prompt("Enter email address to send report:");
+  if (!email) return;
+  const subject = "Project Plan Report";
+  const body = "Please find the attached report.\n(You can attach the downloaded CSV)";
+  window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+</script>
+</body>
+</html>
