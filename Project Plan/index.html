@@ -11,7 +11,7 @@
       color: #333;
     }
     #sidebar {
-      width: 250px;
+      width: 280px;
       background-color: #2E3B4E;
       color: white;
       padding: 15px;
@@ -43,6 +43,7 @@
     th, td {
       border: 1px solid #ccc;
       padding: 8px;
+      text-align: left;
     }
     th {
       background-color: #f2b632;
@@ -51,6 +52,7 @@
     input[type="text"], input[type="date"] {
       width: 95%;
       padding: 5px;
+      box-sizing: border-box;
     }
     .completed-row {
       background-color: #e6ffe6 !important;
@@ -62,6 +64,7 @@
       color: white;
       border: none;
       cursor: pointer;
+      border-radius: 4px;
     }
     .progress-container {
       background-color: #ddd;
@@ -76,6 +79,7 @@
       text-align: center;
       color: #2E3B4E;
       line-height: 25px;
+      white-space: nowrap;
     }
     #unauthorized {
       display: none;
@@ -87,273 +91,231 @@
   </style>
 </head>
 <body>
-  <div id="unauthorized">
-    Access Denied: Your IP address is not authorized to view this project plan.
+
+<div id="sidebar">
+  <h3>Version History</h3>
+  <ul id="versionList"><li>Version history coming soon...</li></ul>
+  <hr />
+  <h3>Current User</h3>
+  <p id="userIp">Loading IP...</p>
+  <h3>Select User</h3>
+  <select id="userSelector" onchange="changeUser()">
+    <option value="Chanelle Booysen">Chanelle Booysen</option>
+    <option value="Admin">Admin</option>
+    <option value="Guest">Guest</option>
+  </select>
+  <p id="lastSaved">Last saved: Never</p>
+</div>
+
+<div id="main">
+  <img src="IITPSA Logo.jpg" alt="IITPSA Logo" style="max-width: 200px; margin-bottom: 20px;" />
+
+  <h1>Programming Olympiad 2025 Project Plan</h1>
+
+  <div id="overall-progress-container" class="progress-container">
+    <div id="overall-progress-bar" class="progress-bar">0%</div>
   </div>
 
-  <div id="dashboard" style="display:none;">
-    <div id="sidebar">
-      <h3>Version History</h3>
-      <ul id="versionList"></ul>
-      <hr />
-      <h3>Current User</h3>
-      <p id="userIp">Loading IP...</p>
-      <h3>Select User</h3>
-      <select id="userSelector" onchange="changeUser()">
-        <option value="Chanelle Booysen">Chanelle Booysen</option>
-        <option value="Admin">Admin</option>
-        <option value="Guest">Guest</option>
-      </select>
-      <p id="lastSaved">Last saved: Never</p>
-    </div>
+  <div id="rounds"></div>
 
-    <div id="main">
-      <img src="IITPSA Logo.jpg" alt="IITPSA Logo" style="max-width: 200px; margin-bottom: 20px;" />
-      <h1>Programming Olympiad 2025 Project Plan</h1>
-      <div id="overall-progress-container" class="progress-container">
-        <div id="overall-progress-bar" class="progress-bar">0%</div>
-      </div>
-      <div id="rounds"></div>
-      <button class="save-btn" onclick="saveAll()">💾 Save Progress</button>
-      <button class="export-btn" onclick="exportToCSV()">📤 Download CSV</button>
-      <button class="export-btn" onclick="emailReport()">📧 Email Report</button>
-    </div>
-  </div>
+  <button class="save-btn" onclick="saveToSheet()">💾 Save Progress</button>
+  <button class="export-btn" onclick="exportToCSV()">📤 Download CSV</button>
+  <button class="export-btn" onclick="emailReport()">📧 Email Report</button>
+</div>
 
-  <script>
-    const allowedIPs = [
-      "41.146.192.188",
-      "41.150.227.167",
-      "102.132.10.50",
-      "154.72.15.33"
-    ];
+<script>
+  const rounds = [
+    { id: "round1", title: "Round 1: Online Contest", initialTasks: ["Publish Contest Date", "Upload Questions", "Open Registration"] },
+    { id: "round2", title: "Round 2: Online Contest", initialTasks: ["Mark Scripts", "Publish Results", "Notify Finalists"] },
+    { id: "round3", title: "Round 3: Finals & Awards Ceremony", initialTasks: ["Book Venue", "Plan Catering", "Manage Program", "Send Invitations"] }
+  ];
 
-    const ipUserMap = {
-      "41.146.192.188": "Chanelle Booysen",
-      "41.150.227.167": "Evelyn Moloantoa",
-      "102.132.10.50": "User 3",
-      "154.72.15.33": "User 4"
-    };
+  // Replace this URL with your published Google Apps Script Web App URL
+  const GOOGLE_SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbxN9K0TtNBEg8kUmoAiZr2TL94WBUi3RsuqAya9jWVCacvD3tdg1Gr-8CvAEUzxz6y5/exec';
 
-    const rounds = [
-      { id: "round1", title: "Round 1: Online Contest", initialTasks: ["Publish Contest Date", "Upload Questions", "Open Registration"] },
-      { id: "round2", title: "Round 2: Online Contest", initialTasks: ["Mark Scripts", "Publish Results", "Notify Finalists"] },
-      { id: "round3", title: "Round 3: Finals & Awards Ceremony", initialTasks: ["Book Venue", "Plan Catering", "Manage Program", "Send Invitations"] }
-    ];
+  function createTable(round) {
+    const container = document.createElement("div");
+    container.innerHTML = `
+      <h2>${round.title}</h2>
+      <div class="progress-container"><div id="${round.id}-progress" class="progress-bar">0%</div></div>
+      <table id="${round.id}">
+        <thead>
+          <tr>
+            <th>Done</th>
+            <th>Task</th>
+            <th>Comment</th>
+            <th>Date Completed</th>
+            <th>Responsible Person</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button class="add-btn" onclick="addRow('${round.id}')">+ Add Task</button>
+    `;
+    document.getElementById("rounds").appendChild(container);
+  }
 
-    // IP access control
-    async function enforceIPAccess() {
-      try {
-        const res = await fetch("https://ipinfo.io/json?token=4fb0252538d9d1");
-        const data = await res.json();
-        const userIP = data.ip;
-        if (allowedIPs.includes(userIP)) {
-          document.getElementById("dashboard").style.display = "flex";
-          document.getElementById("unauthorized").style.display = "none";
-        } else {
-          document.getElementById("dashboard").style.display = "none";
-          document.getElementById("unauthorized").style.display = "block";
-          return; // stop loading data if unauthorized
-        }
-        const user = ipUserMap[userIP] || "Unknown User";
-        document.getElementById("userIp").textContent = `${userIP} (${user})`;
-        await loadLatestSavedVersion();  // load saved data only after IP check passed
-      } catch (e) {
-        document.getElementById("unauthorized").textContent = "Unable to verify IP address.";
-        document.getElementById("unauthorized").style.display = "block";
-        document.getElementById("dashboard").style.display = "none";
-      }
-    }
-
-    // Create tables for rounds
-    function createTable(round) {
-      const container = document.createElement("div");
-      container.innerHTML = `
-        <h2>${round.title}</h2>
-        <div class="progress-container"><div id="${round.id}-progress" class="progress-bar">0%</div></div>
-        <table id="${round.id}"><thead><tr>
-          <th>Done</th><th>Task</th><th>Comment</th><th>Date Completed</th>
-        </tr></thead><tbody></tbody></table>
-        <button class="add-btn" onclick="addRow('${round.id}')">+ Add Task</button>`;
-      document.getElementById("rounds").appendChild(container);
-    }
-
-    function addRow(tableId, task = "", comment = "", date = "", done = false) {
-      const table = document.getElementById(tableId).getElementsByTagName("tbody")[0];
-      const row = table.insertRow();
-      row.innerHTML = `<td><input type="checkbox"${done ? " checked" : ""}></td>
-                       <td><input type="text" value="${task}"></td>
-                       <td><input type="text" value="${comment}"></td>
-                       <td><input type="date" value="${date}"></td>`;
-      row.querySelector("input[type='checkbox']").addEventListener("change", () => {
-        updateProgress();
-        updateHighlight(row);
-      });
+  function addRow(tableId, task = "", comment = "", date = "", done = false, responsible = "") {
+    const table = document.getElementById(tableId).getElementsByTagName("tbody")[0];
+    const row = table.insertRow();
+    row.innerHTML = `
+      <td><input type="checkbox"${done ? " checked" : ""}></td>
+      <td><input type="text" value="${task}"></td>
+      <td><input type="text" value="${comment}"></td>
+      <td><input type="date" value="${date}"></td>
+      <td><input type="text" value="${responsible}"></td>
+    `;
+    row.querySelector("input[type='checkbox']").addEventListener("change", () => {
+      updateProgress();
       updateHighlight(row);
+    });
+    updateHighlight(row);
+    updateProgress();
+  }
+
+  function updateHighlight(row) {
+    row.classList.toggle("completed-row", row.querySelector("input[type='checkbox']").checked);
+  }
+
+  function updateProgress() {
+    let total = 0, done = 0;
+    rounds.forEach(round => {
+      const tbody = document.getElementById(round.id).querySelector("tbody");
+      let roundTotal = 0, roundDone = 0;
+      Array.from(tbody.rows).forEach(row => {
+        total++; roundTotal++;
+        if (row.querySelector("input[type='checkbox']").checked) {
+          done++; roundDone++;
+        }
+      });
+      const percent = roundTotal ? Math.round(roundDone / roundTotal * 100) : 0;
+      const bar = document.getElementById(`${round.id}-progress`);
+      bar.style.width = percent + "%"; bar.textContent = percent + "%";
+    });
+    const overall = total ? Math.round(done / total * 100) : 0;
+    const overallBar = document.getElementById("overall-progress-bar");
+    overallBar.style.width = overall + "%";
+    overallBar.textContent = overall + "%";
+  }
+
+  async function loadFromSheet() {
+    try {
+      const res = await fetch(GOOGLE_SHEET_API_URL);
+      const data = await res.json();
+
+      rounds.forEach(round => {
+        const tbody = document.getElementById(round.id).querySelector("tbody");
+        tbody.innerHTML = "";
+      });
+
+      data.forEach(task => {
+        // Match round by title (case sensitive)
+        const round = rounds.find(r => r.title === task.Round);
+        if (round) {
+          addRow(
+            round.id,
+            task.Task || "",
+            task.Comment || "",
+            task["Date Completed"] || "",
+            task.Done === "TRUE" || task.Done === true,
+            task["Responsible Person"] || ""
+          );
+        }
+      });
+
+      updateProgress();
+      updateLastSavedTime();
+    } catch (e) {
+      alert("Failed to load data from Google Sheets: " + e.message);
+      // If fail, load initial tasks as fallback
+      rounds.forEach(round => {
+        const tbody = document.getElementById(round.id).querySelector("tbody");
+        tbody.innerHTML = "";
+        round.initialTasks.forEach(task => addRow(round.id, task));
+      });
       updateProgress();
     }
+  }
 
-    function updateHighlight(row) {
-      row.classList.toggle("completed-row", row.querySelector("input[type='checkbox']").checked);
-    }
+  async function saveToSheet() {
+    const data = [];
 
-    function updateProgress() {
-      let total = 0,
-        done = 0;
-      rounds.forEach((round) => {
-        const tbody = document.getElementById(round.id).querySelector("tbody");
-        let roundTotal = 0,
-          roundDone = 0;
-        Array.from(tbody.rows).forEach((row) => {
-          total++;
-          roundTotal++;
-          if (row.querySelector("input[type='checkbox']").checked) {
-            done++;
-            roundDone++;
-          }
-        });
-        const percent = roundTotal ? Math.round((roundDone / roundTotal) * 100) : 0;
-        const bar = document.getElementById(`${round.id}-progress`);
-        bar.style.width = percent + "%";
-        bar.textContent = percent + "%";
-      });
-      const overall = total ? Math.round((done / total) * 100) : 0;
-      const overallBar = document.getElementById("overall-progress-bar");
-      overallBar.style.width = overall + "%";
-      overallBar.textContent = overall + "%";
-    }
-
-    // --- NEW: Save/load project data via Netlify Functions ---
-
-    // Save project progress to backend
-    async function saveAll() {
-      const data = {};
-      rounds.forEach((round) => {
-        const tbody = document.getElementById(round.id).querySelector("tbody");
-        data[round.id] = Array.from(tbody.rows).map((row) => {
-          const cells = row.querySelectorAll("input");
-          return {
-            done: cells[0].checked,
-            task: cells[1].value,
-            comment: cells[2].value,
-            date: cells[3].value,
-            timestamp: new Date().toISOString(),
-          };
+    rounds.forEach(round => {
+      const tbody = document.getElementById(round.id).querySelector("tbody");
+      Array.from(tbody.rows).forEach(row => {
+        const inputs = row.querySelectorAll("input, select");
+        data.push({
+          Round: round.title,
+          Task: inputs[1].value,
+          Comment: inputs[2].value,
+          Done: inputs[0].checked,
+          "Date Completed": inputs[3].value,
+          "Responsible Person": inputs[4].value
         });
       });
+    });
 
-      try {
-        const res = await fetch("/.netlify/functions/save-data", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        });
-        const json = await res.json();
-        if (json.success) {
-          alert("Saved to server!");
-          updateLastSavedTime();
-          populateVersionList(); // update version list if needed
-        } else {
-          alert("Save failed");
+    try {
+      const res = await fetch(GOOGLE_SHEET_API_URL, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json"
         }
-      } catch (e) {
-        alert("Error saving data: " + e.message);
-      }
-    }
-
-    // Load project progress from backend
-    async function loadLatestSavedVersion() {
-      try {
-        const res = await fetch("/.netlify/functions/get-data");
-        if (!res.ok) throw new Error("Failed to load saved data");
-        const data = await res.json();
-
-        rounds.forEach((round) => {
-          const tbody = document.getElementById(round.id).querySelector("tbody");
-          tbody.innerHTML = "";
-          if (data[round.id]) {
-            data[round.id].forEach((task) => {
-              addRow(round.id, task.task, task.comment, task.date, task.done);
-            });
-          } else {
-            // If no saved data, add initial tasks
-            round.initialTasks.forEach((task) => addRow(round.id, task));
-          }
-        });
-        updateProgress();
-        updateLastSavedTime();
-        populateVersionList();
-      } catch (e) {
-        // fallback: load initial tasks if error
-        rounds.forEach((round) => {
-          const tbody = document.getElementById(round.id).querySelector("tbody");
-          tbody.innerHTML = "";
-          round.initialTasks.forEach((task) => addRow(round.id, task));
-        });
-        updateProgress();
-        alert("Could not load saved data, loaded defaults.");
-      }
-    }
-
-    // Populate version history list - can be adapted to fetch versions from backend if available
-    function populateVersionList() {
-      // This can be extended to fetch real version history from backend later
-      const list = document.getElementById("versionList");
-      list.innerHTML = "<li>Version history feature coming soon...</li>";
-    }
-
-    // Show last saved time - you can extend this to fetch from backend
-    function updateLastSavedTime() {
-      const now = new Date();
-      document.getElementById("lastSaved").textContent = `Last saved: ${now.toLocaleString()}`;
-    }
-
-    // Existing functions for user IP fetch, change user, export, email report
-    async function fetchUserIP() {
-      try {
-        const res = await fetch("https://ipinfo.io/json?token=4fb0252538d9d1");
-        const data = await res.json();
-        const user = ipUserMap[data.ip] || "Unknown User";
-        document.getElementById("userIp").textContent = `${data.ip} (${user})`;
-      } catch (e) {
-        document.getElementById("userIp").textContent = "IP unavailable";
-      }
-    }
-
-    function changeUser() {
-      const user = document.getElementById("userSelector").value;
-      document.getElementById("userIp").textContent = `${user} (Manual Select)`;
-    }
-
-    function exportToCSV() {
-      let csv = "Round,Done,Task,Comment,Date Completed\n";
-      rounds.forEach((round) => {
-        const tbody = document.getElementById(round.id).querySelector("tbody");
-        Array.from(tbody.rows).forEach((row) => {
-          const inputs = row.querySelectorAll("input");
-          csv += `"${round.title}","${inputs[0].checked ? "Yes" : "No"}","${inputs[1].value}","${inputs[2].value}","${inputs[3].value}"\n`;
-        });
       });
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "Project_Plan_Progress.csv";
-      link.click();
+
+      const result = await res.json();
+      if (result.status === "success") {
+        alert("Saved to Google Sheets!");
+        updateLastSavedTime();
+      } else {
+        alert("Save failed: " + result.message);
+      }
+    } catch (e) {
+      alert("Error saving data: " + e.message);
     }
+  }
 
-    function emailReport() {
-      const email = prompt("Enter email address to send report:");
-      if (!email) return;
-      const subject = "Project Plan Report";
-      const body = "Please find the attached report.\n(You can attach the downloaded CSV)";
-      window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    }
+  function updateLastSavedTime() {
+    const now = new Date();
+    document.getElementById("lastSaved").textContent = `Last saved: ${now.toLocaleString()}`;
+  }
 
-    // Initialize tables
-    rounds.forEach(createTable);
+  function changeUser() {
+    const user = document.getElementById("userSelector").value;
+    document.getElementById("userIp").textContent = `${user} (Manual Select)`;
+  }
 
-    // Start app after IP check
-    enforceIPAccess();
-  </script>
+  function exportToCSV() {
+    let csv = "Round,Done,Task,Comment,Date Completed,Responsible Person\n";
+    rounds.forEach(round => {
+      const tbody = document.getElementById(round.id).querySelector("tbody");
+      Array.from(tbody.rows).forEach(row => {
+        const inputs = row.querySelectorAll("input, select");
+        csv += `"${round.title}","${inputs[0].checked ? "Yes" : "No"}","${inputs[1].value}","${inputs[2].value}","${inputs[3].value}","${inputs[4].value}"\n`;
+      });
+    });
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "Project_Plan_Progress.csv";
+    link.click();
+  }
+
+  function emailReport() {
+    const email = prompt("Enter email address to send report:");
+    if (!email) return;
+    const subject = "Project Plan Report";
+    const body = "Please find the attached report.\n(You can attach the downloaded CSV)";
+    window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
+
+  // Initialize tables on page load
+  rounds.forEach(createTable);
+
+  // Load data from Google Sheets after tables created
+  loadFromSheet();
+</script>
+
 </body>
 </html>
