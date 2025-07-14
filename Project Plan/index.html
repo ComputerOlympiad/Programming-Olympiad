@@ -274,6 +274,26 @@ function emailReport() {
   window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
+// 👇 Load previously saved progress on page load
+function loadLatestSavedVersion() {
+  const savedData = localStorage.getItem("projectData");
+  if (!savedData) return;
+
+  const data = JSON.parse(savedData);
+  rounds.forEach(round => {
+    const tbody = document.getElementById(round.id).querySelector("tbody");
+    tbody.innerHTML = ""; // Clear current content
+    data[round.id].forEach(task => {
+      addRow(round.id, task.task, task.comment, task.date, task.done);
+    });
+  });
+  updateProgress();
+}
+
+// ✅ Call on page load
+loadLatestSavedVersion();
+
+  
 </script>
 </body>
 </html>
